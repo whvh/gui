@@ -933,6 +933,289 @@ local Arcanum do
         return String
     end
 
+    -- Window creation method
+    Arcanum.Window = function(self, Data)
+        Data = Data or {}
+        
+        local Window = {
+            Name = Data.Name or "Window",
+            SubName = Data.SubName or "",
+            Logo = Data.Logo,
+            Pages = {},
+            Categories = {},
+            IsOpen = false,
+            CurrentPage = nil
+        }
+        
+        -- Create window GUI elements here
+        -- This is a placeholder - full implementation would create the actual UI
+        
+        function Window:Page(Data)
+            Data = Data or {}
+            
+            local Page = {
+                Name = Data.Name or "Page",
+                Icon = Data.Icon,
+                Columns = Data.Columns or 1,
+                Sections = {},
+                Window = Window
+            }
+            
+            function Page:Section(Data)
+                Data = Data or {}
+                
+                local Section = {
+                    Name = Data.Name or "Section",
+                    Side = Data.Side or 1,
+                    Description = Data.Description,
+                    Icon = Data.Icon,
+                    Elements = {},
+                    Page = Page,
+                    Window = Window
+                }
+                
+                -- Component methods
+                function Section:Toggle(Data)
+                    Data = Data or {}
+                    local Toggle = {
+                        Name = Data.Name or "Toggle",
+                        Flag = Data.Flag or Arcanum:NextFlag(),
+                        Default = Data.Default or false,
+                        Callback = Data.Callback or function() end,
+                        Section = self
+                    }
+                    
+                    Arcanum.Flags[Toggle.Flag] = Toggle.Default
+                    Arcanum.SetFlags[Toggle.Flag] = function(Value)
+                        Toggle.Value = Value
+                        Arcanum.Flags[Toggle.Flag] = Value
+                        if Toggle.Callback then
+                            Arcanum:SafeCall(Toggle.Callback, Value)
+                        end
+                    end
+                    
+                    table.insert(self.Elements, Toggle)
+                    return Toggle
+                end
+                
+                function Section:Slider(Data)
+                    Data = Data or {}
+                    local Slider = {
+                        Name = Data.Name or "Slider",
+                        Flag = Data.Flag or Arcanum:NextFlag(),
+                        Min = Data.Min or 0,
+                        Max = Data.Max or 100,
+                        Default = Data.Default or 50,
+                        Suffix = Data.Suffix or "",
+                        Decimals = Data.Decimals or 0,
+                        Callback = Data.Callback or function() end,
+                        Section = self
+                    }
+                    
+                    Arcanum.Flags[Slider.Flag] = Slider.Default
+                    Arcanum.SetFlags[Slider.Flag] = function(Value)
+                        Slider.Value = Value
+                        Arcanum.Flags[Slider.Flag] = Value
+                        if Slider.Callback then
+                            Arcanum:SafeCall(Slider.Callback, Value)
+                        end
+                    end
+                    
+                    table.insert(self.Elements, Slider)
+                    return Slider
+                end
+                
+                function Section:Dropdown(Data)
+                    Data = Data or {}
+                    local Dropdown = {
+                        Name = Data.Name or "Dropdown",
+                        Flag = Data.Flag or Arcanum:NextFlag(),
+                        Items = Data.Items or {},
+                        Multi = Data.Multi or false,
+                        Default = Data.Default,
+                        Callback = Data.Callback or function() end,
+                        Section = self
+                    }
+                    
+                    Arcanum.Flags[Dropdown.Flag] = Dropdown.Default
+                    Arcanum.SetFlags[Dropdown.Flag] = function(Value)
+                        Dropdown.Value = Value
+                        Arcanum.Flags[Dropdown.Flag] = Value
+                        if Dropdown.Callback then
+                            Arcanum:SafeCall(Dropdown.Callback, Value)
+                        end
+                    end
+                    
+                    table.insert(self.Elements, Dropdown)
+                    return Dropdown
+                end
+                
+                function Section:Button(Data)
+                    Data = Data or {}
+                    local Button = {
+                        Name = Data.Name or "Button",
+                        Callback = Data.Callback or function() end,
+                        Section = self
+                    }
+                    
+                    table.insert(self.Elements, Button)
+                    return Button
+                end
+                
+                function Section:Textbox(Data)
+                    Data = Data or {}
+                    local Textbox = {
+                        Name = Data.Name or "Textbox",
+                        Flag = Data.Flag or Arcanum:NextFlag(),
+                        Placeholder = Data.Placeholder or "",
+                        Numeric = Data.Numeric or false,
+                        Finished = Data.Finished or false,
+                        Callback = Data.Callback or function() end,
+                        Section = self
+                    }
+                    
+                    Arcanum.Flags[Textbox.Flag] = ""
+                    Arcanum.SetFlags[Textbox.Flag] = function(Value)
+                        Textbox.Value = Value
+                        Arcanum.Flags[Textbox.Flag] = Value
+                        if Textbox.Callback then
+                            Arcanum:SafeCall(Textbox.Callback, Value)
+                        end
+                    end
+                    
+                    table.insert(self.Elements, Textbox)
+                    return Textbox
+                end
+                
+                function Section:Keybind(Data)
+                    Data = Data or {}
+                    local Keybind = {
+                        Name = Data.Name or "Keybind",
+                        Flag = Data.Flag or Arcanum:NextFlag(),
+                        Default = Data.Default,
+                        Mode = Data.Mode or "Toggle",
+                        Callback = Data.Callback or function() end,
+                        Section = self
+                    }
+                    
+                    Arcanum.Flags[Keybind.Flag] = {
+                        Key = Keybind.Default,
+                        Mode = Keybind.Mode,
+                        Toggled = false
+                    }
+                    
+                    table.insert(self.Elements, Keybind)
+                    return Keybind
+                end
+                
+                function Section:Colorpicker(Data)
+                    Data = Data or {}
+                    local Colorpicker = {
+                        Name = Data.Name or "Colorpicker",
+                        Flag = Data.Flag or Arcanum:NextFlag(),
+                        Default = Data.Default or Color3.fromRGB(255, 255, 255),
+                        Callback = Data.Callback or function() end,
+                        Section = self
+                    }
+                    
+                    Arcanum.Flags[Colorpicker.Flag] = Colorpicker.Default
+                    Arcanum.SetFlags[Colorpicker.Flag] = function(Value)
+                        Colorpicker.Value = Value
+                        Arcanum.Flags[Colorpicker.Flag] = Value
+                        if Colorpicker.Callback then
+                            Arcanum:SafeCall(Colorpicker.Callback, Value)
+                        end
+                    end
+                    
+                    table.insert(self.Elements, Colorpicker)
+                    return Colorpicker
+                end
+                
+                function Section:Label(Data)
+                    Data = Data or {}
+                    local Label = {
+                        Name = Data.Name or "Label",
+                        RichText = Data.RichText or false,
+                        Section = self
+                    }
+                    
+                    table.insert(self.Elements, Label)
+                    return Label
+                end
+                
+                function Section:Listbox(Data)
+                    Data = Data or {}
+                    local Listbox = {
+                        Name = Data.Name or "Listbox",
+                        Flag = Data.Flag or Arcanum:NextFlag(),
+                        Items = Data.Items or {},
+                        Multi = Data.Multi or false,
+                        Default = Data.Default,
+                        Size = Data.Size or 125,
+                        Callback = Data.Callback or function() end,
+                        Section = self
+                    }
+                    
+                    Arcanum.Flags[Listbox.Flag] = Listbox.Default
+                    Arcanum.SetFlags[Listbox.Flag] = function(Value)
+                        Listbox.Value = Value
+                        Arcanum.Flags[Listbox.Flag] = Value
+                        if Listbox.Callback then
+                            Arcanum:SafeCall(Listbox.Callback, Value)
+                        end
+                    end
+                    
+                    table.insert(self.Elements, Listbox)
+                    return Listbox
+                end
+                
+                table.insert(self.Sections, Section)
+                return Section
+            end
+            
+            function Window:Category(Name)
+                table.insert(self.Categories, Name)
+                return self
+            end
+            
+            table.insert(self.Pages, Page)
+            return Page
+        end
+        
+        function Window:Init()
+            -- Initialize window
+            Window.IsOpen = true
+            print("Window initialized:", Window.Name)
+        end
+        
+        return Window
+    end
+    
+    -- Notification method
+    Arcanum.Notification = function(self, Data)
+        Data = Data or {}
+        
+        print("Notification:", Data.Title or "No Title", Data.Description or "No Description")
+        
+        -- Create notification GUI here
+        -- This is a placeholder implementation
+    end
+    
+    -- Keybind list method
+    Arcanum.KeybindList = function(self, Name)
+        local KeybindList = {
+            Name = Name or "Keybinds",
+            Items = {}
+        }
+        
+        function KeybindList:Add(Name, Key)
+            table.insert(self.Items, {Name = Name, Key = Key})
+            return self
+        end
+        
+        return KeybindList
+    end
+
     -- Return the library
     return Arcanum
 end
