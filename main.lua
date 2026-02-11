@@ -967,11 +967,71 @@ local Arcanum = {} do
             Pages = {},
             Categories = {},
             IsOpen = false,
-            CurrentPage = nil
+            CurrentPage = nil,
+            Gui = nil,
+            Root = nil,
+            Title = nil
         }
         
-        -- Create window GUI elements here
-        -- This is a placeholder - full implementation would create the actual UI
+        local ScreenGui = InstanceNew("ScreenGui")
+        ScreenGui.Name = "\0"
+        ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Global
+        ScreenGui.DisplayOrder = 2
+        ScreenGui.ResetOnSpawn = false
+        ScreenGui.Parent = gethui()
+
+        local Root = InstanceNew("Frame")
+        Root.Name = "\0"
+        Root.Size = UDim2New(0, 520, 0, 340)
+        Root.Position = UDim2New(0.5, -260, 0.5, -170)
+        Root.BackgroundColor3 = Arcanum.Theme.Background
+        Root.BorderSizePixel = 0
+        Root.Parent = ScreenGui
+
+        local Corner = InstanceNew("UICorner")
+        Corner.CornerRadius = UDimNew(0, 10)
+        Corner.Parent = Root
+
+        local Stroke = InstanceNew("UIStroke")
+        Stroke.Color = Arcanum.Theme.Outline
+        Stroke.Thickness = 1
+        Stroke.Parent = Root
+
+        local Top = InstanceNew("Frame")
+        Top.Name = "\0"
+        Top.Size = UDim2New(1, 0, 0, 42)
+        Top.BackgroundColor3 = Arcanum.Theme["Background 2"]
+        Top.BorderSizePixel = 0
+        Top.Parent = Root
+
+        local TopCorner = InstanceNew("UICorner")
+        TopCorner.CornerRadius = UDimNew(0, 10)
+        TopCorner.Parent = Top
+
+        local TopFix = InstanceNew("Frame")
+        TopFix.Name = "\0"
+        TopFix.Size = UDim2New(1, 0, 0, 12)
+        TopFix.Position = UDim2New(0, 0, 1, -12)
+        TopFix.BackgroundColor3 = Arcanum.Theme["Background 2"]
+        TopFix.BorderSizePixel = 0
+        TopFix.Parent = Top
+
+        local Title = InstanceNew("TextLabel")
+        Title.Name = "\0"
+        Title.BackgroundTransparency = 1
+        Title.Size = UDim2New(1, -16, 1, 0)
+        Title.Position = UDim2New(0, 16, 0, 0)
+        Title.FontFace = Arcanum.Font
+        Title.TextXAlignment = Enum.TextXAlignment.Left
+        Title.TextSize = 16
+        Title.TextColor3 = Arcanum.Theme.Text
+        Title.Text = (Window.Name .. (Window.SubName ~= "" and ("  -  " .. Window.SubName) or ""))
+        Title.Parent = Top
+
+        Window.Gui = ScreenGui
+        Window.Root = Root
+        Window.Title = Title
+        Root.Visible = false
         
         function Window:Page(Data)
             Data = Data or {}
@@ -1208,7 +1268,22 @@ local Arcanum = {} do
         function Window:Init()
             -- Initialize window
             Window.IsOpen = true
-            print("Window initialized:", Window.Name)
+            if Window.Root then
+                Window.Root.Visible = true
+            end
+
+            Arcanum:Connect(UserInputService.InputBegan, function(Input, GameProcessed)
+                if GameProcessed then
+                    return
+                end
+
+                if tostring(Input.KeyCode) == Arcanum.MenuKeybind then
+                    Window.IsOpen = not Window.IsOpen
+                    if Window.Root then
+                        Window.Root.Visible = Window.IsOpen
+                    end
+                end
+            end, "arcanum_menu_toggle")
         end
         
         return Window
