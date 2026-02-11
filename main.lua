@@ -13,7 +13,7 @@
     - Mobile support
     
     @author: SuvCult
-    @version: 1.0.0
+    @version: 1.0.23
 ]]
 
 local Arcanum = {} do 
