@@ -16,7 +16,7 @@
     @version: 1.0.0
 ]]
 
-local Arcanum do 
+local Arcanum = {} do 
     local Workspace = game:GetService("Workspace")
     local UserInputService = game:GetService("UserInputService")
     local Players = game:GetService("Players")
@@ -66,7 +66,8 @@ local Arcanum do
     local RectNew = Rect.new
     local IsMobile = UserInputService.TouchEnabled or false
 
-    Arcanum = {
+    -- Initialize Arcanum table
+    for k, v in {
         Theme =  { },
         MenuKeybind = tostring(Enum.KeyCode.RightControl), 
         Flags = { },
@@ -95,7 +96,9 @@ local Arcanum do
         NotifHolder = nil,
         UnusedHolder = nil,
         Font = nil
-    }
+    } do
+        Arcanum[k] = v
+    end
 
     Arcanum.__index = Arcanum
     Arcanum.Sections.__index = Arcanum.Sections
