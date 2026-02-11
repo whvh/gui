@@ -44,6 +44,23 @@ local Arcanum = {} do
         return CoreGui
     end
 
+    local function GetUiParent()
+        local ok, parent = pcall(gethui)
+        if ok and typeof(parent) == "Instance" then
+            return parent
+        end
+
+        local lp = Players.LocalPlayer
+        if lp then
+            local pg = lp:FindFirstChildOfClass("PlayerGui")
+            if pg then
+                return pg
+            end
+        end
+
+        return CoreGui
+    end
+
     local LocalPlayer = Players.LocalPlayer
     local Camera = Workspace.CurrentCamera
     local Mouse = LocalPlayer:GetMouse()
@@ -974,14 +991,28 @@ local Arcanum = {} do
         }
         
         local ScreenGui = InstanceNew("ScreenGui")
-        ScreenGui.Name = "\0"
+        ScreenGui.Name = "Arcanum"
         ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Global
         ScreenGui.DisplayOrder = 2
         ScreenGui.ResetOnSpawn = false
-        ScreenGui.Parent = gethui()
+        ScreenGui.Enabled = true
+
+        local parent = GetUiParent()
+        local ok = pcall(function()
+            ScreenGui.Parent = parent
+        end)
+
+        if not ok and Players.LocalPlayer then
+            local pg = Players.LocalPlayer:FindFirstChildOfClass("PlayerGui")
+            if pg then
+                pcall(function()
+                    ScreenGui.Parent = pg
+                end)
+            end
+        end
 
         local Root = InstanceNew("Frame")
-        Root.Name = "\0"
+        Root.Name = "Root"
         Root.Size = UDim2New(0, 520, 0, 340)
         Root.Position = UDim2New(0.5, -260, 0.5, -170)
         Root.BackgroundColor3 = Arcanum.Theme.Background
@@ -998,7 +1029,7 @@ local Arcanum = {} do
         Stroke.Parent = Root
 
         local Top = InstanceNew("Frame")
-        Top.Name = "\0"
+        Top.Name = "Top"
         Top.Size = UDim2New(1, 0, 0, 42)
         Top.BackgroundColor3 = Arcanum.Theme["Background 2"]
         Top.BorderSizePixel = 0
@@ -1009,7 +1040,7 @@ local Arcanum = {} do
         TopCorner.Parent = Top
 
         local TopFix = InstanceNew("Frame")
-        TopFix.Name = "\0"
+        TopFix.Name = "TopFix"
         TopFix.Size = UDim2New(1, 0, 0, 12)
         TopFix.Position = UDim2New(0, 0, 1, -12)
         TopFix.BackgroundColor3 = Arcanum.Theme["Background 2"]
@@ -1017,7 +1048,7 @@ local Arcanum = {} do
         TopFix.Parent = Top
 
         local Title = InstanceNew("TextLabel")
-        Title.Name = "\0"
+        Title.Name = "Title"
         Title.BackgroundTransparency = 1
         Title.Size = UDim2New(1, -16, 1, 0)
         Title.Position = UDim2New(0, 16, 0, 0)
