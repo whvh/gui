@@ -13,7 +13,7 @@
     - Mobile support
     
     @author: SuvCult
-    @version: 1.0.1
+    @version: 1.0.0
 ]]
 
 local Arcanum = {} do 
@@ -25,6 +25,20 @@ local Arcanum = {} do
     local CoreGui = cloneref and cloneref(game:GetService("CoreGui")) or game:GetService("CoreGui")
     local TweenService = game:GetService("TweenService")
     local Lighting = game:GetService("Lighting")
+
+    local _isfolder = isfolder
+    local _makefolder = makefolder
+    local _isfile = isfile
+    local _writefile = writefile
+    local _readfile = readfile
+    local _delfile = delfile
+    local _listfiles = listfiles
+    local _getcustomasset = getcustomasset
+
+    local HasFS = type(_isfolder) == "function" and type(_makefolder) == "function"
+    local HasFiles = type(_isfile) == "function" and type(_writefile) == "function"
+    local HasCustomAsset = type(_getcustomasset) == "function"
+    local HasListFiles = type(_listfiles) == "function"
 
     gethui = gethui or function()
         return CoreGui
@@ -198,9 +212,11 @@ local Arcanum = {} do
     Arcanum.Theme = TableClone(Themes["Preset"])
 
     -- Create folders
-    for Index, Value in Arcanum.Folders do 
-        if not isfolder(Value) then
-            makefolder(Value)
+    if HasFS then
+        for Index, Value in Arcanum.Folders do 
+            if not _isfolder(Value) then
+                _makefolder(Value)
+            end
         end
     end
 
@@ -586,24 +602,28 @@ local Arcanum = {} do
     -- Custom font system
     local CustomFont = { } do
         function CustomFont:New(Name, Weight, Style, Data)
-            if not isfile(Data.Id) then 
-                writefile(Data.Id, game:HttpGet(Data.Url))
+            if not (HasFiles and HasCustomAsset) then
+                return nil
             end
 
-            local Data = {
+            if not _isfile(Data.Id) then 
+                _writefile(Data.Id, game:HttpGet(Data.Url))
+            end
+
+            local FontData = {
                 name = Name,
                 faces = {
                     {
                         name = Name,
                         weight = Weight,
                         style = Style,
-                        assetId = getcustomasset(Data.Id)
+                        assetId = _getcustomasset(Data.Id)
                     }
                 }
             }
 
-            writefile(`{Arcanum.Folders.Assets}/{Name}.font`, HttpService:JSONEncode(Data))
-            return getcustomasset(`{Arcanum.Folders.Assets}/{Name}.font`)
+            _writefile(`{Arcanum.Folders.Assets}/{Name}.font`, HttpService:JSONEncode(FontData))
+            return _getcustomasset(`{Arcanum.Folders.Assets}/{Name}.font`)
         end
 
         local SemiBold = Font.new("rbxassetid://12187365364", Enum.FontWeight.SemiBold, Enum.FontStyle.Normal)
