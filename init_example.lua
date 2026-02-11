@@ -9,7 +9,7 @@
 -- local Arcanum = loadfile("c:/Users/Gamer pc/Desktop/arcanum/src/main.lua")()
 
 -- For production, use your GitHub raw URL:
-local Arcanum = loadstring(game:HttpGet("https://raw.githubusercontent.com/whvh/gui/refs/heads/main/init.lua"))()
+local Arcanum = loadstring(game:HttpGet("https://raw.githubusercontent.com/whvh/gui/refs/heads/main/main.lua"))()
 
 -- Create main window
 local Window = Arcanum:Window({
