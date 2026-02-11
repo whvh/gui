@@ -1219,3 +1219,6 @@ local Arcanum do
     -- Return the library
     return Arcanum
 end
+
+-- Return Arcanum for require compatibility
+return Arcanum
